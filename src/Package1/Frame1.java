@@ -7,6 +7,12 @@ package Package1;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  *
@@ -14,72 +20,142 @@ import java.awt.Graphics;
  */
 public class Frame1 extends javax.swing.JFrame {
 
+    ArrayList<Node> nodos;
+    ArrayList<Edge> arcos;
+    Node nodoinicial = null, nodofinal = null;
+    int cont;
+    int iniciox, inicioy, finx, finy;
+    
     /**
      * Creates new form Frame1
      */
     public Frame1() {
-        
-        setLocation(100,30);
+        cont=0;
+        nodos = new ArrayList<>();
+        arcos = new ArrayList<>();
+        setLocation(20,10);
         setResizable(false);
         initComponents();
-        if(true)
-            AddingAutoNodes(PanelMap.getGraphics());
-        
+        Cargar();
     }
     
-    private void AddingAutoNodes(Graphics g){
-        g.setColor(Color.pink);
-        g.fillOval(53, 9, 20, 20);
-        g.fillOval(294, 14, 20, 20);
-        g.fillOval(650, 10, 20, 20);
-        g.fillOval(979, 43, 20, 20);
-        g.fillOval(237, 77, 20, 20);
-        g.fillOval(3, 71, 20, 20);
-        g.fillOval(584, 73, 20, 20);
-        g.fillOval(932, 98, 20, 20);
-        g.fillOval(183, 142, 20, 20);
-        g.fillOval(460, 150, 20, 20);
-        g.fillOval(524, 110, 20, 20);
-        g.fillOval(618, 120, 20, 20);
-        g.fillOval(882, 158, 20, 20);
-        g.fillOval(133, 202, 20, 20);
-        g.fillOval(323, 236, 20, 20);
-        g.fillOval(394, 193, 20, 20);
-        g.fillOval(546, 241, 20, 20);
-        g.fillOval(586, 174, 20, 20);
-        g.fillOval(819, 234, 20, 20);
-        g.fillOval(1091, 274, 20, 20);
-        g.fillOval(84, 261, 20, 20);
-        g.fillOval(266, 288, 20, 20);
-        g.fillOval(362, 300, 20, 20);
-        g.fillOval(492, 318, 20, 20);
-        g.fillOval(757, 304, 20, 20);
-        g.fillOval(1032, 354, 20, 20);
-        g.fillOval(24, 322, 20, 20);
-        g.fillOval(219, 350, 20, 20);
-        g.fillOval(445, 377, 20, 20);
-        g.fillOval(1125, 209, 20, 20);
-        g.fillOval(700, 370, 20, 20);
-        g.fillOval(177, 405, 20, 20);
-        g.fillOval(86, 434, 20, 20);
-        g.fillOval(397, 447, 20, 20);
-        g.fillOval(643, 439, 20, 20);
-        g.fillOval(970, 438, 20, 20);
-        g.fillOval(40, 500, 20, 20);
-        g.fillOval(100, 520, 20, 20);
-        g.fillOval(138, 465, 20, 20);
-        g.fillOval(215, 502, 20, 20);
-        g.fillOval(446, 487, 20, 20);
-        g.fillOval(495, 525, 20, 20);
-        g.fillOval(590, 506, 20, 20);
-        g.fillOval(917, 510, 20, 20);
+    private void Cargar() {
+        String cadena;
+        try(FileReader f = new FileReader("Files/Nodos.txt"); BufferedReader b = new BufferedReader(f)){            
+            while((cadena = b.readLine())!=null) {
+                String[] vector = cadena.split(",");  //NombreDeNodo,posx,posy
+                nodos.add(new Node((vector[0]),Integer.parseInt(vector[1]),Integer.parseInt(vector[2]),Color.BLACK));
+            }
+        } catch (IOException ex) {
+
+        }      
+        try(FileReader f = new FileReader("Files/Aristas.txt"); BufferedReader b = new BufferedReader(f)){            
+            while((cadena = b.readLine())!=null) {
+                String[] vector = cadena.split(",");  //nodoinicial,x1,y1,nodofinal,x2,y2
+                //int nodoinicial, int nodofinal, int x1, int y1, int x2, int y2, int dist
+                arcos.add(new Edge(Integer.parseInt(vector[0]), Integer.parseInt(vector[1]), Integer.parseInt(vector[2]),
+                        Integer.parseInt(vector[3]) ,Integer.parseInt(vector[4]), Integer.parseInt(vector[5]), Integer.parseInt(vector[6])));
+            }
+        } catch (IOException ex) {
+            
+        }
+    }
+    
+        private void dibujar(Graphics g) {
+        int conta=1;
+        g.setColor(Color.black);
+        for (Node nodo : nodos) {
+            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
+            g.drawString(Integer.toString(conta), nodo.posx-11, nodo.posy-10);
+            conta++;
+        }
+        for (Edge arco : arcos) {
+            g.setColor(Color.DARK_GRAY);
+            g.drawLine(arco.x1, arco.y1,arco.x2,arco.y2);
+        }
+        }
+    
         
-        
-        
-        
+        private void Choosingpoints(Graphics g) {
+        PanelMap.addMouseListener(new MouseListener(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(cont==1){
+                    g.setColor(Color.red);
+                    g.fillOval(e.getX()-13, e.getY()-13, 25, 25);
+                    g.setColor(Color.white);
+                    g.drawString("L", e.getX()-4, e.getY()+4);
+                    finx=e.getX()-10;
+                    finy=e.getY()-10;
+                    cont++;
+                    select.setEnabled(false);
+                    Calcularnodoscerca(iniciox,inicioy,finx,finy,PanelMap.getGraphics());
+                }
+                if(cont==0){
+                    g.setColor(Color.red);
+                    g.fillOval(e.getX()-13, e.getY()-13, 25, 25);
+                    g.setColor(Color.white);
+                    g.drawString("P", e.getX()-4, e.getY()+4);
+                    iniciox=e.getX()-10;
+                    inicioy=e.getY()-10;
+                    cont++;
+                }
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+        });
     }
     
     
+    private void Calcularnodoscerca(int x1, int y1, int x2, int y2, Graphics g) {
+        
+        //Buscar el nodo que esté más cerca del nodo inicial..
+        int dist=2000,x=0,y=0;
+        double dist2;
+        for (Node nodo : nodos) {
+            dist2=Math.sqrt(Math.pow(Math.abs(x1-nodo.posx), 2) + Math.pow(Math.abs(y1-nodo.posy), 2));
+            System.out.println(nodo.name+"="+dist2);
+            if(dist2<dist){
+                dist= (int)dist2;
+                x=nodo.posx;
+                y=nodo.posy;
+            }
+        }
+        g.setColor(Color.blue);
+        g.fillOval(x-8, y-8, 20, 20);
+        
+        //Buscar el nodo que esté más cerca del nodo final...
+        dist=2000;
+        x=0;
+        y=0;
+        for (Node nodo : nodos) {
+            dist2=Math.sqrt(Math.pow(Math.abs(x2-nodo.posx), 2) + Math.pow(Math.abs(y2-nodo.posy), 2));
+            if(dist2<dist){
+                dist= (int)dist2;
+                x=nodo.posx;
+                y=nodo.posy;
+            }
+        }
+        g.setColor(Color.blue);
+        g.fillOval(x-8, y-8, 20, 20);
+                
+    }
+        
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -94,7 +170,7 @@ public class Frame1 extends javax.swing.JFrame {
         PanelMap = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         PanelData = new javax.swing.JPanel();
-        restore = new javax.swing.JButton();
+        select = new javax.swing.JButton();
         PanelTitle = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -115,11 +191,11 @@ public class Frame1 extends javax.swing.JFrame {
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        restore.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        restore.setText("Seleccionar punto de partida y llegada");
-        restore.addActionListener(new java.awt.event.ActionListener() {
+        select.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        select.setText("Seleccionar punto de partida y llegada");
+        select.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                restoreActionPerformed(evt);
+                selectActionPerformed(evt);
             }
         });
 
@@ -129,14 +205,14 @@ public class Frame1 extends javax.swing.JFrame {
             PanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelDataLayout.createSequentialGroup()
                 .addContainerGap(133, Short.MAX_VALUE)
-                .addComponent(restore)
+                .addComponent(select)
                 .addGap(31, 31, 31))
         );
         PanelDataLayout.setVerticalGroup(
             PanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelDataLayout.createSequentialGroup()
                 .addContainerGap(57, Short.MAX_VALUE)
-                .addComponent(restore, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(select, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -179,7 +255,7 @@ public class Frame1 extends javax.swing.JFrame {
                         .addComponent(PanelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(PanelData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(130, Short.MAX_VALUE))
         );
         PanelMainLayout.setVerticalGroup(
             PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,22 +273,30 @@ public class Frame1 extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(PanelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void restoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restoreActionPerformed
+    private void selectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectActionPerformed
+        dibujar(PanelMap.getGraphics());
+        Choosingpoints(PanelMap.getGraphics());
+    }//GEN-LAST:event_selectActionPerformed
 
-        AddingAutoNodes(PanelMap.getGraphics());
-
-    }//GEN-LAST:event_restoreActionPerformed
-
+    
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -256,6 +340,7 @@ public class Frame1 extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JButton restore;
+    private javax.swing.JButton select;
     // End of variables declaration//GEN-END:variables
+
 }
