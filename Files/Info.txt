@@ -1,0 +1,5 @@
+Para pintar los nodos en la pantalla, debo restarle 8 pixeles a cada componente..
+La posición es correcta y exacta, debo restarle ocho para que cuando lo pinte se vea centrado..
+Para mostrar los nodos y aristas, buscar el evento que se ejecuta cuando se presiona el botón
+de la pantalla, ya ahí se uncomment la línea que está comentada.
+
