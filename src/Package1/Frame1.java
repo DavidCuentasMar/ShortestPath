@@ -129,7 +129,6 @@ public class Frame1 extends javax.swing.JFrame {
         double dist2;
         for (Node nodo : nodos) {
             dist2=Math.sqrt(Math.pow(Math.abs(x1-nodo.posx), 2) + Math.pow(Math.abs(y1-nodo.posy), 2));
-            System.out.println(nodo.name+"="+dist2);
             if(dist2<dist){
                 dist= (int)dist2;
                 x=nodo.posx;
@@ -288,7 +287,7 @@ public class Frame1 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectActionPerformed
-        dibujar(PanelMap.getGraphics());
+        //dibujar(PanelMap.getGraphics());
         Choosingpoints(PanelMap.getGraphics());
     }//GEN-LAST:event_selectActionPerformed
 
