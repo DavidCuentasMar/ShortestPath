@@ -66,7 +66,7 @@ public class Frame1 extends javax.swing.JFrame {
         int conta=1;
         g.setColor(Color.black);
         for (Node nodo : nodos) {
-            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
+//            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
             g.drawString(Integer.toString(conta), nodo.posx-11, nodo.posy-10);
             conta++;
         }
@@ -105,7 +105,7 @@ public class Frame1 extends javax.swing.JFrame {
                     g.setColor(Color.blue);
                     g.fillOval(e.getX() - (25/2), e.getY() - (25/2), 5, 5);
 
-                    distanciaRectas(iniciox,inicioy);
+                    distanciaRectas(iniciox+10,inicioy+10);
                 }
             }
             
@@ -131,42 +131,76 @@ public class Frame1 extends javax.swing.JFrame {
     }
     
     private void distanciaRectas(int Cx, int Cy) {
+        double xp = 0;
+        double yp = 0;
         double u = 0;
+        double d=0;        
         double min = Double.POSITIVE_INFINITY;int n1=0; int n2=0;
         for (Edge arco : arcos) {
-            u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.x2-arco.y1, 2));
-            if (u>=0 && u<=1) {
-                double d = Math.abs(((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2))));
-                System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
-                if (min>d) {
-                    min=d;
-                    n1=arco.nodoinicial;n2=arco.nodofinal;
+            u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.x2-arco.y1, 2));            
+            xp = (arco.x1 + (u * (arco.x2 - arco.x1)));
+            yp = (arco.y1 + (u * (arco.y2 - arco.y1)));              
+            if (u>0 && u<1) {                
+    //              double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
+                    d = Math.sqrt(Math.pow(xp - Cx, 2) + Math.pow(yp - Cy, 2));
+
+                    if (min>d) {
+                        min=d;
+                        n1=arco.nodoinicial;n2=arco.nodofinal;
+                    }
+                    System.out.println("u:" + u +"//" +"d: "+d + " - ["+arco.nodoinicial+","+arco.nodofinal+"] // xp: "+xp+" // yp: "+yp);
+                }else{
+//                    if (u>1) {
+//                        d = Math.sqrt(Math.pow(arco.x2 - Cx, 2) + Math.pow(arco.y2 - Cy, 2));
+//                        if (min>d) {
+//                            min=d;
+//                            n1=arco.nodoinicial;n2=arco.nodofinal;
+//                        }
+//                    }else{
+//                            d = Math.sqrt(Math.pow(arco.x1 - Cx, 2) + Math.pow(arco.y1 - Cy, 2));
+//                            if (min>d) {
+//                                min=d;
+//                                n1=arco.nodoinicial;n2=arco.nodofinal;
+//                        }
+//                    }
                 }
-            
-              
                 
-            }
+            
         }
+            
         System.out.println("Shortest Arista P ["+n1+","+n2+"]");
         
-        
-//        double min = Double.POSITIVE_INFINITY;
-//        System.out.println("Cx"+Cx+" [] Cy"+Cy);
-//        int n1=0; int n2=0;
-//        for (Edge arco : arcos) {
-//            double d = Math.abs(((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2))));
-//            System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
-//            if (min>d) {
-//                min=d;
-//                n1=arco.nodoinicial;n2=arco.nodofinal;
-//            }
-//
-//            
+    }
+            
+            
+            
+//           
+
+//if (u<0) {
+////                System.out.println("Menores que 0("+arco.nodoinicial+","+arco.nodofinal+")");
+////            }
+////            if (u>=0 && u<=1) {
+////                
+////                System.out.println("Entre 0 y 1("+arco.nodoinicial+","+arco.nodofinal+")");
+//////                double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
+//////                System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
+//////                if (min>d) {
+//////                    min=d;
+//////                    n1=arco.nodoinicial;n2=arco.nodofinal;
+//////                }
+////            
+////              
+////                
+////            }
+////            if (u>1) {
+////                System.out.println("mayores que 1("+arco.nodoinicial+","+arco.nodofinal+")");
+////            }
 //        }
 //        System.out.println("Shortest Arista P ["+n1+","+n2+"]");
+        
+
     
     
-    }
     private void Calcularnodoscerca(int x1, int y1, int x2, int y2, Graphics g) {
         
         //Buscar el nodo que esté más cerca del nodo inicial..
@@ -211,6 +245,7 @@ public class Frame1 extends javax.swing.JFrame {
         PanelData = new javax.swing.JPanel();
         select = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         PanelTitle = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -244,12 +279,20 @@ public class Frame1 extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("jButton2");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout PanelDataLayout = new javax.swing.GroupLayout(PanelData);
         PanelData.setLayout(PanelDataLayout);
         PanelDataLayout.setHorizontalGroup(
             PanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelDataLayout.createSequentialGroup()
-                .addContainerGap(133, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
                 .addGroup(PanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1)
                     .addComponent(select))
@@ -263,6 +306,9 @@ public class Frame1 extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(select, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelDataLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton2))
         );
 
         javax.swing.GroupLayout PanelTitleLayout = new javax.swing.GroupLayout(PanelTitle);
@@ -285,7 +331,6 @@ public class Frame1 extends javax.swing.JFrame {
                 .addGroup(PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(PanelMap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(PanelMainLayout.createSequentialGroup()
-                        .addGap(0, 0, 0)
                         .addComponent(PanelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(PanelData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -330,7 +375,44 @@ public class Frame1 extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         dibujar(PanelMap.getGraphics());
+//        for (Edge arco : arcos) {
+//            System.out.println("("+arco.nodoinicial+","+arco.nodofinal+")");
+//            
+//        }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+            PanelMap.addMouseListener(new MouseListener(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                finx=e.getX();
+                finy=e.getY();
+                System.out.println(finx+","+finy);
+                distanciaRectas(finx,finy);
+                
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+            
+
+        });
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     
     
@@ -378,6 +460,7 @@ public class Frame1 extends javax.swing.JFrame {
     private javax.swing.JPanel PanelMap;
     private javax.swing.JPanel PanelTitle;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton select;
     // End of variables declaration//GEN-END:variables
