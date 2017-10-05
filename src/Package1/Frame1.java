@@ -102,7 +102,10 @@ public class Frame1 extends javax.swing.JFrame {
                     iniciox=e.getX()-10;
                     inicioy=e.getY()-10;
                     cont++;
-                    distanciaRectas(finx,finy);
+                    g.setColor(Color.blue);
+                    g.fillOval(e.getX() - (25/2), e.getY() - (25/2), 5, 5);
+
+                    distanciaRectas(iniciox,inicioy);
                 }
             }
             
@@ -128,15 +131,39 @@ public class Frame1 extends javax.swing.JFrame {
     }
     
     private void distanciaRectas(int Cx, int Cy) {
-        int min = (int) Double.POSITIVE_INFINITY;
+        double u = 0;
+        double min = Double.POSITIVE_INFINITY;int n1=0; int n2=0;
         for (Edge arco : arcos) {
-            double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
-            System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
-//            if (min<d) {
-//                
-//            }
+            u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.x2-arco.y1, 2));
+            if (u>=0 && u<=1) {
+                double d = Math.abs(((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2))));
+                System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
+                if (min>d) {
+                    min=d;
+                    n1=arco.nodoinicial;n2=arco.nodofinal;
+                }
             
+              
+                
+            }
         }
+        System.out.println("Shortest Arista P ["+n1+","+n2+"]");
+        
+        
+//        double min = Double.POSITIVE_INFINITY;
+//        System.out.println("Cx"+Cx+" [] Cy"+Cy);
+//        int n1=0; int n2=0;
+//        for (Edge arco : arcos) {
+//            double d = Math.abs(((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2))));
+//            System.out.println(d + "["+arco.nodoinicial+","+arco.nodofinal+"]");
+//            if (min>d) {
+//                min=d;
+//                n1=arco.nodoinicial;n2=arco.nodofinal;
+//            }
+//
+//            
+//        }
+//        System.out.println("Shortest Arista P ["+n1+","+n2+"]");
     
     
     }
