@@ -133,6 +133,7 @@ public class Frame1 extends javax.swing.JFrame {
     private void distanciaRectas(int Cx, int Cy, Graphics g) {
         g.setColor(Color.red);
         g.fillOval((int)Cx, (int)Cy, 5, 5);
+        double a=0,b=0;
         double px = 0;
         double py = 0;
         double u = 0;
@@ -140,24 +141,31 @@ public class Frame1 extends javax.swing.JFrame {
         double min = Double.POSITIVE_INFINITY;int n1=0; int n2=0;
         g.setColor(Color.blue);
         for (Edge arco : arcos) {
-            u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.x2-arco.y1, 2));            
+//             u = ((Cx - arco.x1) * (arco.x2 - arco.x1) + (Cy - arco.y1) * (arco.y2 - arco.y1)) / (Math.pow(Xb - Xa, 2) + (Math.pow(Yb - Ya, 2)));
+            
+            
+            
+            u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.y2-arco.y1, 2));            
             px = (arco.x1 + (u * (arco.x2 - arco.x1)));
             py = (arco.y1 + (u * (arco.y2 - arco.y1)));               
-            g.fillOval((int)px, (int)py, 5, 5);
+            
             System.out.println(u);
-//            if (u>0 && u<1) {                
-//    //              double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
-//                    d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                    
-//                    if (min>d) {
-//                        min=d;
-//                        n1=arco.nodoinicial;n2=arco.nodofinal;
-//                    }
-//                    
-//                }else{
-//                }
-                
+            if (u>0 && u<1) {                
+    //              double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
+                    d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                    
+                    if (min>d) {
+                        min=d;
+                        a=px;
+                        b=py;
+                        n1=arco.nodoinicial;n2=arco.nodofinal;
+                    }
+                    
+                }else{
+                }
+//                
             
         }
+        g.fillOval((int)a, (int)b, 5, 5);
             
         System.out.println("Shortest Arista P ["+n1+","+n2+"]");
         
