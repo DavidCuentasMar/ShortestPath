@@ -32,6 +32,7 @@ public class Frame1 extends javax.swing.JFrame {
     boolean clicked = false;
     int cont;
     int iniciox, inicioy, finx, finy;
+    int cx1, cy1, cx2,cy2;
     
     /**
      * Creates new form Frame1
@@ -137,13 +138,18 @@ public class Frame1 extends javax.swing.JFrame {
     }
     
     private void distanciaRectas(int Cx, int Cy, Graphics g) {
-        g.setColor(Color.red);
-        if (cont==1) {
+        g.setColor(Color.red);     
+        if (cont==1) {           
+            cx1=Cx;
+            cy1=Cy;
             g.fillOval((int)Cx, (int)Cy, 5, 5);
-            g.drawString("P", (int)Cx, (int)Cy);           
+            g.drawString("P", (int)Cx, (int)Cy);         
+            
         }else{
             g.fillOval((int)Cx, (int)Cy, 5, 5);
             g.drawString("L", (int)Cx, (int)Cy);        
+            cx2=Cx;
+            cy2=Cy;
         }
 
         double px = 0;
@@ -177,21 +183,58 @@ public class Frame1 extends javax.swing.JFrame {
             }                  
         }                  
         if (cont==2) {
+//            Calcularnodoscerca(cx1,cy1,cx2,cy2,PanelMap.getGraphics());
             System.out.println("Shortest Arista P ["+a1.nodoinicial+","+a1.nodofinal+"]");
             System.out.println("Shortest Arista L ["+a2.nodoinicial+","+a2.nodofinal+"]");
             matrizDeAdyacencia();
             // a1.nodoinicial -  a2.nodoinicial
-            int distancia1 = dijkstra(a1.nodoinicial);
+            int distancia1 = dijkstra(a1.nodoinicial, a2.nodoinicial);
+            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
+            
+            
             
             // a1.nodoinicial -  a2.nodofinal
+            int distancia2 = dijkstra(a1.nodoinicial, a2.nodofinal);
+            System.out.println("["+a1.nodoinicial+" - "+ a2.nodofinal +"] : " + distancia2);
 
  
             // a1.nodofinal / a2.nodoinicial
-
+            int distancia3 = dijkstra(a1.nodofinal, a2.nodoinicial);
+            System.out.println("["+a1.nodofinal+" - "+ a2.nodoinicial +"] : " + distancia3);
             
             // a1.nodofinal / a2.nodofinal
-
+            int distancia4 = dijkstra(a1.nodofinal, a2.nodofinal);
+            System.out.println("["+a1.nodofinal+" - "+ a2.nodofinal +"] : " + distancia4);
+            int[] vec = new int [4];
+            vec[0]=distancia1;
+            vec[1]=distancia2;
+            vec[2]=distancia3;
+            vec[3]=distancia4;
+            int mn = Integer.MAX_VALUE;
+            for (int i = 0; i < vec.length; i++) {
+                if (mn>vec[i]) {
+                    mn=vec[i];
+                }                
+            }
+            String recorrido="";
+            if (mn==distancia1) {
+                recorrido=dijkstraR(a1.nodoinicial, a2.nodoinicial);
+                System.out.println(recorrido);
+            }
+            if (mn==distancia2) {
+                recorrido=dijkstraR(a1.nodoinicial, a2.nodofinal);
+                System.out.println(recorrido);
+            }
+            if (mn==distancia3) {
+                recorrido=dijkstraR(a1.nodofinal, a2.nodoinicial);
+                System.out.println(recorrido);
+            }
+            if (mn==distancia4) {
+                recorrido=dijkstraR(a1.nodofinal, a2.nodofinal);
+                System.out.println(recorrido);
+            }
             
+            pintarRecorrido(recorrido, this.PanelMap.getGraphics());
         }
             
         
@@ -552,7 +595,7 @@ public class Frame1 extends javax.swing.JFrame {
 
     }
 
-    private int dijkstra(int s) {
+    private int dijkstra(int s, int meta) {
         Cola c = new Cola();
         int x=0;
         int distancia[] = new int[nodos.size()+1];
@@ -581,17 +624,11 @@ public class Frame1 extends javax.swing.JFrame {
             }        
         }
         System.out.println("Distancias ");
-        for (int i = 1; i < distancia.length; i++) {
-              System.out.println("["+i+"] "+distancia[i]);            
-        }
-        
-        
-        
-        
-        
-        
-        
-        
+//        for (int i = 1; i < distancia.length; i++) {
+//              System.out.println("["+i+"] "+distancia[i] + " ["+ padre[i]+"]");            
+//        }
+        int pad = padre[meta];              
+        x = distancia[meta];
         return x;
     }
 
@@ -614,7 +651,7 @@ public class Frame1 extends javax.swing.JFrame {
             }            
         }
         cadena = cadena.substring(0, cadena.length()-1);
-        System.out.println("Adyacentes ("+u+"):" + cadena);
+//        System.out.println("Adyacentes ("+u+"):" + cadena);
         String[] aux = cadena.split(",");
         int[] vector = new int[aux.length];
         for (int i = 0; i < aux.length; i++) {
@@ -639,6 +676,89 @@ public class Frame1 extends javax.swing.JFrame {
         }
         return 0;
     }
-    
+
+    private String dijkstraR(int s, int meta) {
+        String r="";
+        Cola c = new Cola();
+        int x=0;
+        int distancia[] = new int[nodos.size()+1];
+        int padre[] = new int[nodos.size()+1];
+        boolean visto[] = new boolean[nodos.size()+1];
+        for (int i = 1; i < distancia.length; i++) {
+            distancia[i]=Integer.MAX_VALUE;
+            padre[i]=0;
+            visto[i]=false;                     
+        }
+        distancia[s]=0;
+        c.addCola(new nodo(s,0));
+        while(c.ptr!=null){
+            nodo u = c.getMinimo();
+            visto[u.name]=true;
+//            System.out.println(u.name);
+//            c.show();
+            int[] adyacentes = getAdyacentes(u.name);
+            for (int i = 0; i < adyacentes.length; i++) {
+                int v = adyacentes[i];
+                if (visto[v]==false && distancia[v]>distancia[u.name]+peso(u,v)) {
+                    distancia[v]= distancia[u.name]+peso(u,v);
+                    padre[v]=u.name;
+                    c.addCola(new nodo(v,distancia[v]));                                       
+                }                
+            }        
+        }
+//        System.out.println("Distancias ");
+//        for (int i = 1; i < distancia.length; i++) {
+//              System.out.println("["+i+"] "+distancia[i] + " ["+ padre[i]+"]");            
+//        }
+        int pad = meta;              
+        x = distancia[meta];
+        while(pad!=s){
+            r=r+pad+",";
+            pad = padre[pad];           
+        }
+        r=r+s+";";
+        r=r.substring(0,r.length()-1);        
+        
+        return r;
+    }
+
+    private void pintarRecorrido(String recorrido, Graphics g) {
+        String[] rs = recorrido.split(",");
+        int[] r = new int [rs.length];
+        for (int i = 0; i < rs.length; i++) {
+            r[i]=Integer.parseInt(rs[i]);            
+        }
+        for(int i = 0; i < r.length - 1; i++){
+            for(int j = 0; j < r.length - 1; j++){
+                if (r[j] > r[j + 1]){
+                    int tmp = r[j+1];
+                    r[j+1] = r[j];
+                    r[j] = tmp;
+                }
+            }
+        }
+
+        g.setColor(Color.black);
+        for (Node nodo : nodos) {
+            for (int i = 0; i < r.length; i++) {
+                if (Integer.parseInt(nodo.name)==r[i]) {
+                    g.setColor(Color.yellow);    
+                    g.fillOval(nodo.posx, nodo.posy, 10, 10);
+                    
+                }
+            }
+//            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
+//            g.drawString(Integer.toString(conta), nodo.posx-11, nodo.posy-10);
+//            conta++;
+//        }
+//        for (Edge arco : arcos) {
+//            g.setColor(Color.DARK_GRAY);
+//            g.drawLine(arco.x1, arco.y1,arco.x2,arco.y2);
+//        }
+        
+        
+
+    }
+    }
 
 }
