@@ -19,7 +19,13 @@ import java.util.ArrayList;
  * @author Andres
  */
 public class Frame1 extends javax.swing.JFrame {
-
+    boolean ft = true;
+    Edge a1,a2;
+    String [][] matrizAd;
+    int [] distancias;
+    String [] padre;
+    boolean [] visto;
+    double px1=0,py1=0,px2=0,py2=0;
     ArrayList<Node> nodos;
     ArrayList<Edge> arcos;
     Node nodoinicial = null, nodofinal = null;
@@ -45,7 +51,7 @@ public class Frame1 extends javax.swing.JFrame {
         try(FileReader f = new FileReader("Files/Nodos.txt"); BufferedReader b = new BufferedReader(f)){            
             while((cadena = b.readLine())!=null) {
                 String[] vector = cadena.split(",");  //NombreDeNodo,posx,posy
-                nodos.add(new Node((vector[0]),Integer.parseInt(vector[1]),Integer.parseInt(vector[2]),Color.BLACK));
+                nodos.add(new Node((vector[0]),Integer.parseInt(vector[1]),Integer.parseInt(vector[2]),Color.BLACK,0));
             }
         } catch (IOException ex) {
 
@@ -132,8 +138,14 @@ public class Frame1 extends javax.swing.JFrame {
     
     private void distanciaRectas(int Cx, int Cy, Graphics g) {
         g.setColor(Color.red);
-        g.fillOval((int)Cx, (int)Cy, 5, 5);
-        double a=0,b=0;
+        if (cont==1) {
+            g.fillOval((int)Cx, (int)Cy, 5, 5);
+            g.drawString("P", (int)Cx, (int)Cy);           
+        }else{
+            g.fillOval((int)Cx, (int)Cy, 5, 5);
+            g.drawString("L", (int)Cx, (int)Cy);        
+        }
+
         double px = 0;
         double py = 0;
         double u = 0;
@@ -141,33 +153,47 @@ public class Frame1 extends javax.swing.JFrame {
         double min = Double.POSITIVE_INFINITY;int n1=0; int n2=0;
         g.setColor(Color.blue);
         for (Edge arco : arcos) {
-//             u = ((Cx - arco.x1) * (arco.x2 - arco.x1) + (Cy - arco.y1) * (arco.y2 - arco.y1)) / (Math.pow(Xb - Xa, 2) + (Math.pow(Yb - Ya, 2)));
-            
-            
-            
+    //      u = ((Cx - arco.x1) * (arco.x2 - arco.x1) + (Cy - arco.y1) * (arco.y2 - arco.y1)) / (Math.pow(Xb - Xa, 2) + (Math.pow(Yb - Ya, 2)));
             u = (((Cx-arco.x1)*(arco.x2-arco.x1))+((Cy-arco.y1)*(arco.y2-arco.y1)))/(Math.pow(arco.x2-arco.x1, 2)+Math.pow(arco.y2-arco.y1, 2));            
             px = (arco.x1 + (u * (arco.x2 - arco.x1)));
             py = (arco.y1 + (u * (arco.y2 - arco.y1)));               
-            
-            System.out.println(u);
+            //System.out.println(u);
             if (u>0 && u<1) {                
-    //              double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
-                    d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                    
-                    if (min>d) {
-                        min=d;
-                        a=px;
-                        b=py;
-                        n1=arco.nodoinicial;n2=arco.nodofinal;
+        //      double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
+                d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                    
+                if (min>d) {
+                    min=d;
+                    if (cont==1) {
+                        px1=px;
+                        py1=py;
+                        a1 = new Edge(arco.nodoinicial,arco.nodofinal,arco.x1,arco.y1,arco.x2,arco.y2,arco.dist);
+                    }else{
+                        px2=px;
+                        py2=py;
+                        a2 = new Edge(arco.nodoinicial,arco.nodofinal,arco.x1,arco.y1,arco.x2,arco.y2,arco.dist);                              
                     }
-                    
-                }else{
+//                  n1=arco.nodoinicial;n2=arco.nodofinal; //(Arista)
                 }
-//                
+            }                  
+        }                  
+        if (cont==2) {
+            System.out.println("Shortest Arista P ["+a1.nodoinicial+","+a1.nodofinal+"]");
+            System.out.println("Shortest Arista L ["+a2.nodoinicial+","+a2.nodofinal+"]");
+            matrizDeAdyacencia();
+            // a1.nodoinicial -  a2.nodoinicial
+            int distancia1 = dijkstra(a1.nodoinicial);
+            
+            // a1.nodoinicial -  a2.nodofinal
+
+ 
+            // a1.nodofinal / a2.nodoinicial
+
+            
+            // a1.nodofinal / a2.nodofinal
+
             
         }
-        g.fillOval((int)a, (int)b, 5, 5);
             
-        System.out.println("Shortest Arista P ["+n1+","+n2+"]");
         
     }
             
@@ -364,40 +390,60 @@ public class Frame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-            PanelMap.addMouseListener(new MouseListener(){
+        if (ft==true) {
+            MouseListener m = new MouseListener(){
+                
             @Override
+            
             public void mouseClicked(MouseEvent e) {
-                finx=e.getX()-2;
-                finy=e.getY()-2;
-                System.out.println(finx+","+finy);
-                distanciaRectas(finx,finy,PanelMap.getGraphics());
+                 
+                if (cont<2) {
+                    cont++;
+                    finx=e.getX()-2;
+                    finy=e.getY()-2;
+                    //System.out.println(finx+","+finy);
+                    distanciaRectas(finx,finy,PanelMap.getGraphics());                    
+                }
+                
                 
             }
+
+               @Override
+               public void mousePressed(MouseEvent e) {
+                  // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+               }
+
+               @Override
+               public void mouseReleased(MouseEvent e) {
+              //     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+               }
+
+               @Override
+               public void mouseEntered(MouseEvent e) {
+             //      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+               }
+
+               @Override
+               public void mouseExited(MouseEvent e) {
+             //      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+               }                    
             
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-
+            }; 
+            ft=false;
+             
+               PanelMap.addMouseListener(m);      
+        }
             
-
-        });
+    
+        
+            
+            
         
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         this.repaint();
+        cont=0;
     }//GEN-LAST:event_jButton3ActionPerformed
 
     
@@ -451,5 +497,148 @@ public class Frame1 extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton select;
     // End of variables declaration//GEN-END:variables
+     
+
+    
+
+    private void matrizDeAdyacencia() {
+        matrizAd = new String[nodos.size()+1][nodos.size()+1];            
+            int mX=1, mY=1;
+            //System.out.println(cantNodos);
+            for (Node nodo : nodos) {
+                matrizAd[mX][0] = nodo.name+"";
+                matrizAd[0][mY] = nodo.name+"";
+                mX++; mY++;
+            }
+//            for (int x=0; x < matrizAd. length; x++) {
+//                for (int y=0; y < matrizAd[x]. length; y++) {
+//                    if (x>0 && y>0 || x==0 & y==0) {
+//                        System.out.print (matrizAd[x][y]+","); 
+//                    }else{
+//                        System.out.print (matrizAd[x][y]+",");                  
+//                    }
+//                }
+//                System.out.println("");
+//            }
+//            System.out.println(arcos.size());
+            for (Edge arco : arcos) {
+                for (int i = 0; i < matrizAd.length; i++) {
+                    if (arco.nodoinicial==i) {
+                        for (int j = 0; j < matrizAd.length; j++) {                       
+                            if (arco.nodofinal==j) {
+                                matrizAd[i][j]=arco.dist+"";
+                                matrizAd[j][i]=arco.dist+"";
+                            }
+                        }                        
+                    }                    
+                }
+                
+            }
+            
+            for (int x=0; x < matrizAd. length; x++) {
+                for (int y=0; y < matrizAd[x]. length; y++) {
+                    if (matrizAd[x][y]==null) {
+                        matrizAd[x][y]="*";
+                    }
+//                    if (x>0 && y>0 || x==0 & y==0) {
+//                        System.out.print (matrizAd[x][y]+","); 
+//                    }else{
+//                        System.out.print (matrizAd[x][y]+",");                  
+//                    }
+                }
+//                System.out.println("");
+            }
+            
+
+    }
+
+    private int dijkstra(int s) {
+        Cola c = new Cola();
+        int x=0;
+        int distancia[] = new int[nodos.size()+1];
+        int padre[] = new int[nodos.size()+1];
+        boolean visto[] = new boolean[nodos.size()+1];
+        for (int i = 1; i < distancia.length; i++) {
+            distancia[i]=Integer.MAX_VALUE;
+            padre[i]=0;
+            visto[i]=false;                     
+        }
+        distancia[s]=0;
+        c.addCola(new nodo(s,0));
+        while(c.ptr!=null){
+            nodo u = c.getMinimo();
+            visto[u.name]=true;
+//            System.out.println(u.name);
+//            c.show();
+            int[] adyacentes = getAdyacentes(u.name);
+            for (int i = 0; i < adyacentes.length; i++) {
+                int v = adyacentes[i];
+                if (visto[v]==false && distancia[v]>distancia[u.name]+peso(u,v)) {
+                    distancia[v]= distancia[u.name]+peso(u,v);
+                    padre[v]=u.name;
+                    c.addCola(new nodo(v,distancia[v]));                                       
+                }                
+            }        
+        }
+        System.out.println("Distancias ");
+        for (int i = 1; i < distancia.length; i++) {
+              System.out.println("["+i+"] "+distancia[i]);            
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        return x;
+    }
+
+    private int[] getAdyacentes(int u) {       
+        String cadena="";
+//        for (int i = 0; i < matrizAd.length; i++) {
+//            for (int j = 0; j < matrizAd.length; j++) {
+//                System.out.print(matrizAd[i][j]+",");
+//            }
+//            System.out.println("");
+//            
+//        }
+        for (int i = 0; i < matrizAd.length; i++) {
+            if (i==u) {
+                for (int j = 1; j < matrizAd.length; j++) {
+                    if (!matrizAd[i][j].equals("*")) {
+                        cadena = cadena + matrizAd[0][j]+",";                        
+                    }                                       
+                }
+            }            
+        }
+        cadena = cadena.substring(0, cadena.length()-1);
+        System.out.println("Adyacentes ("+u+"):" + cadena);
+        String[] aux = cadena.split(",");
+        int[] vector = new int[aux.length];
+        for (int i = 0; i < aux.length; i++) {
+            vector[i]=Integer.parseInt(aux[i]);            
+        }
+
+        return vector;
+    }
+
+    private int peso(nodo u, int v) {
+        for (int i = 0; i < matrizAd.length; i++) {
+            if (i==u.name) {
+                for (int j = 1; j < matrizAd.length; j++) {
+                    if (j==v) {
+//                        System.out.println("PESO: " + matrizAd[i][j]);
+                        return Integer.parseInt(matrizAd[i][j]);
+                        
+                    }
+                                       
+                }
+            }            
+        }
+        return 0;
+    }
+    
 
 }

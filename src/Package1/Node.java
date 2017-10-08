@@ -13,12 +13,15 @@ public class Node {
     protected int posx;
     protected int posy;
     protected Color color;
+    public Node link;
+    public int peso;
 
-    public Node(String name, int posx, int posy, Color color) {
+    public Node(String name, int posx, int posy, Color color, int peso) {
         this.name = name;
         this.posx = posx;
         this.posy = posy;
         this.color = color;
+        this.peso=0;
     }
 
     public Color getColor() {
