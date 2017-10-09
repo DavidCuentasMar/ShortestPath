@@ -18,8 +18,8 @@ public class Cola {
             }
             n.link=p;
         }
-        System.out.println("se metió: " + p.name);
-        show();
+        //System.out.println("se metió: " + p.name);
+        //show();
     
     }
 

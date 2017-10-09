@@ -184,16 +184,29 @@ public class Frame1 extends javax.swing.JFrame {
             }                  
         }                  
         if (cont==2) {
-//            Calcularnodoscerca(cx1,cy1,cx2,cy2,PanelMap.getGraphics());
+            Calcularnodoscerca(cx1,cy1,cx2,cy2,PanelMap.getGraphics());
             System.out.println("Shortest Arista P ["+a1.nodoinicial+","+a1.nodofinal+"]");
             System.out.println("Shortest Arista L ["+a2.nodoinicial+","+a2.nodofinal+"]");
             matrizDeAdyacencia();
             // a1.nodoinicial -  a2.nodoinicial
-        int dist=2000;
+            //Buscar el nodo que esté más cerca del nodo inicial..
+        int dist=2000,x=0,y=0;
+        int nodoi=0;
         double dist2;
-        int x=0;
+        for (Node nodo : nodos) {
+            dist2=Math.sqrt(Math.pow(Math.abs(cx1-nodo.posx), 2) + Math.pow(Math.abs(cy1-nodo.posy), 2));
+            if(dist2<dist){
+                nodoi=Integer.parseInt(nodo.name);
+                dist= (int)dist2;
+                x=nodo.posx;
+                y=nodo.posy;
+                d1=dist;
+            }
+        }
+//        System.out.println("DIST: " + dist);
+        g.setColor(Color.blue);
+        g.fillOval(x-8, y-8, 20, 20);
         int nodof=0;
-        int y=0;
         for (Node nodo : nodos) {
             dist2=Math.sqrt(Math.pow(Math.abs(cx2-nodo.posx), 2) + Math.pow(Math.abs(cy2-nodo.posy), 2));
             if(dist2<dist){
@@ -206,8 +219,8 @@ public class Frame1 extends javax.swing.JFrame {
         }
         g.setColor(Color.blue);
         g.fillOval(x-8, y-8, 20, 20);
-            int distancia1 = dijkstra(a1.nodoinicial, nodof);
-//            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
+            int distancia1 = dijkstra(a1.nodoinicial, a2.nodoinicial);
+            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
 
             // a1.nodoinicial -  a2.nodofinal
             int distancia2 = dijkstra(a1.nodoinicial, a2.nodofinal);
@@ -251,7 +264,7 @@ public class Frame1 extends javax.swing.JFrame {
 //                System.out.println(recorrido);
             }
             
-            pintarRecorrido(recorrido, this.PanelMap.getGraphics());
+//            pintarRecorrido(recorrido, this.PanelMap.getGraphics());
         }
             
         
@@ -627,7 +640,7 @@ public class Frame1 extends javax.swing.JFrame {
             visto[i]=false;                     
         }
         distancia[s]=0;
-        System.out.println(s);
+        //System.out.println(s);
         c.addCola(new nodo(s,0));
         while(c.ptr!=null){
             nodo u = c.getMinimo();
@@ -636,7 +649,7 @@ public class Frame1 extends javax.swing.JFrame {
             for (int i = 0; i < adyacentes.length; i++) {
                 int v = adyacentes[i];
                 if (visto[v]==false && distancia[v]>distancia[u.name]+peso(u,v)) {
-                    System.out.println("distancia["+u.name+","+v+"]: " + distancia[u.name] + peso(u,v) +" //" + (distancia[u.name] + peso(u,v)));
+                    //System.out.println("distancia["+u.name+","+v+"]: " + distancia[u.name] + peso(u,v) +" //" + (distancia[u.name] + peso(u,v)));
                     distancia[v]= distancia[u.name]+peso(u,v);
 //                    System.out.println("DV" + distancia[v]);
                     padre[v]=u.name;
@@ -649,9 +662,9 @@ public class Frame1 extends javax.swing.JFrame {
 //                    }
                     c.addCola(new nodo(v,distancia[v]));    
                 }
-                System.out.println("-----");
-                c.show();
-                System.out.println("-----");
+//                System.out.println("-----");
+//                c.show();
+//                System.out.println("-----");
                 
             }  
         }
@@ -682,7 +695,7 @@ public class Frame1 extends javax.swing.JFrame {
             }            
         }
         cadena = cadena.substring(0, cadena.length()-1);
-        System.out.println("Adyacentes ("+u+"):" + cadena);
+        //System.out.println("Adyacentes ("+u+"):" + cadena);
         String[] aux = cadena.split(",");
         int[] vector = new int[aux.length];
         for (int i = 0; i < aux.length; i++) {
@@ -744,9 +757,12 @@ public class Frame1 extends javax.swing.JFrame {
             pad = padre[pad];           
         }
         r=r+s+";";
-        r=r.substring(0,r.length()-1);        
         
+        r=r.substring(0,r.length()-1); 
+        System.out.println(r);
+        System.out.println(x);
         return r;
+        
     }
 
     private void pintarRecorrido(String recorrido, Graphics g) {
