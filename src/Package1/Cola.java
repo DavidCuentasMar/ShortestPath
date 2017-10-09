@@ -9,13 +9,17 @@ public class Cola {
     }
     
     public void addCola(nodo p){
-        if (ptr==null) {
-            ptr=p;          
+        nodo n = this.ptr;
+        if (n==null) {
+            this.ptr=p;
         }else{
-            ultimo.link=p;            
+            while(n.link!=null){
+                n=n.link;
+            }
+            n.link=p;
         }
-        ultimo=p;  
-        
+        System.out.println("se metió: " + p.name);
+        show();
     
     }
 

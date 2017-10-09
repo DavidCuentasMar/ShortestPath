@@ -20,6 +20,7 @@ import java.util.ArrayList;
  */
 public class Frame1 extends javax.swing.JFrame {
     boolean ft = true;
+    int d1,d2;
     Edge a1,a2;
     String [][] matrizAd;
     int [] distancias;
@@ -188,50 +189,66 @@ public class Frame1 extends javax.swing.JFrame {
             System.out.println("Shortest Arista L ["+a2.nodoinicial+","+a2.nodofinal+"]");
             matrizDeAdyacencia();
             // a1.nodoinicial -  a2.nodoinicial
-            int distancia1 = dijkstra(a1.nodoinicial, a2.nodoinicial);
-            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
-            
-            
-            
+        int dist=2000;
+        double dist2;
+        int x=0;
+        int nodof=0;
+        int y=0;
+        for (Node nodo : nodos) {
+            dist2=Math.sqrt(Math.pow(Math.abs(cx2-nodo.posx), 2) + Math.pow(Math.abs(cy2-nodo.posy), 2));
+            if(dist2<dist){
+                nodof=Integer.parseInt(nodo.name);
+                dist= (int)dist2;
+                x=nodo.posx;
+                y=nodo.posy;
+                d2=dist;
+            }
+        }
+        g.setColor(Color.blue);
+        g.fillOval(x-8, y-8, 20, 20);
+            int distancia1 = dijkstra(a1.nodoinicial, nodof);
+//            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
+
             // a1.nodoinicial -  a2.nodofinal
             int distancia2 = dijkstra(a1.nodoinicial, a2.nodofinal);
-            System.out.println("["+a1.nodoinicial+" - "+ a2.nodofinal +"] : " + distancia2);
+//            System.out.println("["+a1.nodoinicial+" - "+ a2.nodofinal +"] : " + distancia2);
 
  
             // a1.nodofinal / a2.nodoinicial
             int distancia3 = dijkstra(a1.nodofinal, a2.nodoinicial);
-            System.out.println("["+a1.nodofinal+" - "+ a2.nodoinicial +"] : " + distancia3);
+//            System.out.println("["+a1.nodofinal+" - "+ a2.nodoinicial +"] : " + distancia3);
             
             // a1.nodofinal / a2.nodofinal
             int distancia4 = dijkstra(a1.nodofinal, a2.nodofinal);
-            System.out.println("["+a1.nodofinal+" - "+ a2.nodofinal +"] : " + distancia4);
+            
+//            System.out.println("["+a1.nodofinal+" - "+ a2.nodofinal +"] : " + distancia4);
             int[] vec = new int [4];
             vec[0]=distancia1;
             vec[1]=distancia2;
             vec[2]=distancia3;
             vec[3]=distancia4;
             int mn = Integer.MAX_VALUE;
-            for (int i = 0; i < vec.length; i++) {
+            for (int i = 0; i < 1; i++) {
                 if (mn>vec[i]) {
                     mn=vec[i];
                 }                
-            }
+            }            
             String recorrido="";
             if (mn==distancia1) {
                 recorrido=dijkstraR(a1.nodoinicial, a2.nodoinicial);
-                System.out.println(recorrido);
+//                System.out.println(recorrido);
             }
             if (mn==distancia2) {
                 recorrido=dijkstraR(a1.nodoinicial, a2.nodofinal);
-                System.out.println(recorrido);
+//                System.out.println(recorrido);
             }
             if (mn==distancia3) {
                 recorrido=dijkstraR(a1.nodofinal, a2.nodoinicial);
-                System.out.println(recorrido);
+//                System.out.println(recorrido);
             }
             if (mn==distancia4) {
                 recorrido=dijkstraR(a1.nodofinal, a2.nodofinal);
-                System.out.println(recorrido);
+//                System.out.println(recorrido);
             }
             
             pintarRecorrido(recorrido, this.PanelMap.getGraphics());
@@ -251,8 +268,10 @@ public class Frame1 extends javax.swing.JFrame {
                 dist= (int)dist2;
                 x=nodo.posx;
                 y=nodo.posy;
+                d1=dist;
             }
         }
+        System.out.println("DIST: " + dist);
         g.setColor(Color.blue);
         g.fillOval(x-8, y-8, 20, 20);
         
@@ -266,6 +285,7 @@ public class Frame1 extends javax.swing.JFrame {
                 dist= (int)dist2;
                 x=nodo.posx;
                 y=nodo.posy;
+                d2=dist;
             }
         }
         g.setColor(Color.blue);
@@ -607,27 +627,38 @@ public class Frame1 extends javax.swing.JFrame {
             visto[i]=false;                     
         }
         distancia[s]=0;
+        System.out.println(s);
         c.addCola(new nodo(s,0));
         while(c.ptr!=null){
             nodo u = c.getMinimo();
             visto[u.name]=true;
-//            System.out.println(u.name);
-//            c.show();
             int[] adyacentes = getAdyacentes(u.name);
             for (int i = 0; i < adyacentes.length; i++) {
                 int v = adyacentes[i];
                 if (visto[v]==false && distancia[v]>distancia[u.name]+peso(u,v)) {
+                    System.out.println("distancia["+u.name+","+v+"]: " + distancia[u.name] + peso(u,v) +" //" + (distancia[u.name] + peso(u,v)));
                     distancia[v]= distancia[u.name]+peso(u,v);
+//                    System.out.println("DV" + distancia[v]);
                     padre[v]=u.name;
-                    c.addCola(new nodo(v,distancia[v]));                                       
-                }                
-            }        
+//                    if (u.name==6 && v==9) {
+//                        System.out.println("ajaaa");
+//                        nodo n = new nodo(v,distancia[v]);
+//                        System.out.println(n.name);
+//                        System.out.println(n.peso);
+//                        c.addCola(n);
+//                    }
+                    c.addCola(new nodo(v,distancia[v]));    
+                }
+                System.out.println("-----");
+                c.show();
+                System.out.println("-----");
+                
+            }  
         }
-        System.out.println("Distancias ");
+//        System.out.println("Distancias ");
 //        for (int i = 1; i < distancia.length; i++) {
 //              System.out.println("["+i+"] "+distancia[i] + " ["+ padre[i]+"]");            
-//        }
-        int pad = padre[meta];              
+//        }             
         x = distancia[meta];
         return x;
     }
@@ -651,7 +682,7 @@ public class Frame1 extends javax.swing.JFrame {
             }            
         }
         cadena = cadena.substring(0, cadena.length()-1);
-//        System.out.println("Adyacentes ("+u+"):" + cadena);
+        System.out.println("Adyacentes ("+u+"):" + cadena);
         String[] aux = cadena.split(",");
         int[] vector = new int[aux.length];
         for (int i = 0; i < aux.length; i++) {
@@ -662,17 +693,13 @@ public class Frame1 extends javax.swing.JFrame {
     }
 
     private int peso(nodo u, int v) {
-        for (int i = 0; i < matrizAd.length; i++) {
-            if (i==u.name) {
-                for (int j = 1; j < matrizAd.length; j++) {
-                    if (j==v) {
-//                        System.out.println("PESO: " + matrizAd[i][j]);
-                        return Integer.parseInt(matrizAd[i][j]);
-                        
-                    }
-                                       
-                }
-            }            
+        for (Edge arco : arcos) {
+            if (arco.nodoinicial==u.name && arco.nodofinal == v) {
+//                System.out.println(u.name +","+v);
+//                System.out.println(arco.dist+" aaa");
+                return arco.dist;
+            }
+            
         }
         return 0;
     }
@@ -747,6 +774,14 @@ public class Frame1 extends javax.swing.JFrame {
                     
                 }
             }
+//            for (int i = 0; i < r.length-1; i++) {
+//                if (Integer.parseInt(nodo.name)==r[i]) {
+//                    g.setColor(Color.red); 
+//                    Node n = getNode(r[i]);
+//                    g.drawLine(nodo.posx, nodo.posy,n.posx,n.posy);
+//                }
+//                
+//            }
 //            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
 //            g.drawString(Integer.toString(conta), nodo.posx-11, nodo.posy-10);
 //            conta++;
@@ -759,6 +794,16 @@ public class Frame1 extends javax.swing.JFrame {
         
 
     }
+    }
+
+    private Node getNode(int i) {
+        for (Node nodo : nodos) {
+            if (Integer.parseInt(nodo.name)==i) {
+                return nodo;
+            }
+            
+        }
+        return null;
     }
 
 }
