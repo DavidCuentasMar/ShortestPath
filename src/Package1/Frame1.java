@@ -167,7 +167,13 @@ public class Frame1 extends javax.swing.JFrame {
             //System.out.println(u);
             if (u>0 && u<1) {                
         //      double d = ((arco.x2-arco.x1)*(Cy-arco.y1)-(arco.y2-arco.y1)*(Cx-arco.x1))/Math.sqrt((Math.pow(arco.x2-arco.x1, 2))+(Math.pow(arco.y2-arco.y1, 2)));
-                d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                    
+                d = Math.sqrt(Math.pow(px - Cx, 2) + Math.pow(py - Cy, 2));                  
+                if (cont==1) {
+                    d1=(int)d;
+                }
+                if (cont==2) {
+                    d2=(int)d;
+                }
                 if (min>d) {
                     min=d;
                     if (cont==1) {
@@ -190,7 +196,7 @@ public class Frame1 extends javax.swing.JFrame {
             matrizDeAdyacencia();
             // a1.nodoinicial -  a2.nodoinicial
             //Buscar el nodo que esté más cerca del nodo inicial..
-        int dist=2000,x=0,y=0;
+        int dist=5000,x=0,y=0;
         int nodoi=0;
         double dist2;
         for (Node nodo : nodos) {
@@ -204,13 +210,15 @@ public class Frame1 extends javax.swing.JFrame {
             }
         }
 //        System.out.println("DIST: " + dist);
+        dist=5000;
         g.setColor(Color.blue);
-        g.fillOval(x-8, y-8, 20, 20);
+        g.fillOval(x-8, y-8, 5, 5);
         int nodof=0;
         for (Node nodo : nodos) {
             dist2=Math.sqrt(Math.pow(Math.abs(cx2-nodo.posx), 2) + Math.pow(Math.abs(cy2-nodo.posy), 2));
             if(dist2<dist){
                 nodof=Integer.parseInt(nodo.name);
+                //System.out.println("gol " + nodof);
                 dist= (int)dist2;
                 x=nodo.posx;
                 y=nodo.posy;
@@ -218,23 +226,25 @@ public class Frame1 extends javax.swing.JFrame {
             }
         }
         g.setColor(Color.blue);
-        g.fillOval(x-8, y-8, 20, 20);
-            int distancia1 = dijkstra(a1.nodoinicial, a2.nodoinicial);
-            System.out.println("["+a1.nodoinicial+" - "+ a2.nodoinicial +"] : " + distancia1);
+        g.fillOval(x-8, y-8, 5, 5);
+            int distancia1 = dijkstra(a1.nodoinicial, nodof);
+            System.out.println("["+a1.nodoinicial+" - "+ nodof +"] : " + (distancia1+d1+d2));
 
-            // a1.nodoinicial -  a2.nodofinal
-            int distancia2 = dijkstra(a1.nodoinicial, a2.nodofinal);
-//            System.out.println("["+a1.nodoinicial+" - "+ a2.nodofinal +"] : " + distancia2);
+            // a1.nodoinicial -  a2.nodofinal            
+            //int distancia2 = dijkstra(a1.nodoinicial, nodof);
+            int distancia2 =50000;
+            //System.out.println("["+a1.nodoinicial+" - "+ nodof +"] : " + (distancia2+d1+d2));
 
  
             // a1.nodofinal / a2.nodoinicial
-            int distancia3 = dijkstra(a1.nodofinal, a2.nodoinicial);
-//            System.out.println("["+a1.nodofinal+" - "+ a2.nodoinicial +"] : " + distancia3);
+            int distancia3 = dijkstra(a1.nodofinal, nodof);
+            System.out.println("["+a1.nodofinal+" - "+ nodof +"] : " + (distancia3+d1+d2));
             
             // a1.nodofinal / a2.nodofinal
-            int distancia4 = dijkstra(a1.nodofinal, a2.nodofinal);
+            //int distancia4 = dijkstra(a1.nodofinal, nodof);
+            int distancia4 = 50000;            
+            //System.out.println("["+a1.nodofinal+" - "+ nodof +"] : " + (distancia4+d1+d2));
             
-//            System.out.println("["+a1.nodofinal+" - "+ a2.nodofinal +"] : " + distancia4);
             int[] vec = new int [4];
             vec[0]=distancia1;
             vec[1]=distancia2;
@@ -248,23 +258,23 @@ public class Frame1 extends javax.swing.JFrame {
             }            
             String recorrido="";
             if (mn==distancia1) {
-                recorrido=dijkstraR(a1.nodoinicial, a2.nodoinicial);
+                recorrido=dijkstraR(a1.nodoinicial, nodof);
 //                System.out.println(recorrido);
             }
             if (mn==distancia2) {
-                recorrido=dijkstraR(a1.nodoinicial, a2.nodofinal);
+                recorrido=dijkstraR(a1.nodoinicial, nodof);
 //                System.out.println(recorrido);
             }
             if (mn==distancia3) {
-                recorrido=dijkstraR(a1.nodofinal, a2.nodoinicial);
+                recorrido=dijkstraR(a1.nodofinal, nodof);
 //                System.out.println(recorrido);
             }
             if (mn==distancia4) {
-                recorrido=dijkstraR(a1.nodofinal, a2.nodofinal);
+                recorrido=dijkstraR(a1.nodofinal, nodof);
 //                System.out.println(recorrido);
             }
             
-//            pintarRecorrido(recorrido, this.PanelMap.getGraphics());
+            pintarRecorrido(recorrido, this.PanelMap.getGraphics());
         }
             
         
@@ -759,8 +769,8 @@ public class Frame1 extends javax.swing.JFrame {
         r=r+s+";";
         
         r=r.substring(0,r.length()-1); 
-        System.out.println(r);
-        System.out.println(x);
+        //System.out.println(r);
+        //System.out.println(x);
         return r;
         
     }
@@ -779,38 +789,21 @@ public class Frame1 extends javax.swing.JFrame {
                     r[j] = tmp;
                 }
             }
-        }
-
-        g.setColor(Color.black);
-        for (Node nodo : nodos) {
-            for (int i = 0; i < r.length; i++) {
-                if (Integer.parseInt(nodo.name)==r[i]) {
-                    g.setColor(Color.yellow);    
-                    g.fillOval(nodo.posx, nodo.posy, 10, 10);
-                    
-                }
+        }        
+            System.out.println("[ " + recorrido + " ]");
+            for (int i = 0; i < r.length-1; i++) {
+                System.out.println(r[i]);
+                Edge arco = getArista(r[i],r[i+1]);
+                g.setColor(Color.blue);
+                g.drawLine(arco.x1, arco.y1,arco.x2,arco.y2);
+                
             }
-//            for (int i = 0; i < r.length-1; i++) {
-//                if (Integer.parseInt(nodo.name)==r[i]) {
-//                    g.setColor(Color.red); 
-//                    Node n = getNode(r[i]);
-//                    g.drawLine(nodo.posx, nodo.posy,n.posx,n.posy);
-//                }
-//                
-//            }
-//            g.fillOval(nodo.posx-8, nodo.posy-8, 20, 20);
-//            g.drawString(Integer.toString(conta), nodo.posx-11, nodo.posy-10);
-//            conta++;
-//        }
-//        for (Edge arco : arcos) {
-//            g.setColor(Color.DARK_GRAY);
-//            g.drawLine(arco.x1, arco.y1,arco.x2,arco.y2);
-//        }
+            
         
         
 
     }
-    }
+    
 
     private Node getNode(int i) {
         for (Node nodo : nodos) {
@@ -818,6 +811,16 @@ public class Frame1 extends javax.swing.JFrame {
                 return nodo;
             }
             
+        }
+        return null;
+    }
+
+    private Edge getArista(int nodoinicial, int nodofinal) {
+        for (Edge arco : arcos) {
+            if (arco.nodoinicial==nodoinicial && arco.nodofinal==nodofinal) {
+                System.out.println("["+arco.nodoinicial+","+arco.nodofinal+"]");
+                return arco;
+            }
         }
         return null;
     }
